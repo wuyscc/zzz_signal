@@ -29,9 +29,26 @@ If your install lives somewhere the auto-detect can't find (a non-Steam launcher
 curl -fsSL https://raw.githubusercontent.com/wuyscc/zzz_signal/main/signal.sh | bash -s -- "/path/to/Zenless Zone Zero"
 ```
 
-With no argument, the script auto-detects the game install by checking the default Steam location and every Steam library listed in `libraryfolders.vdf`.
+With no argument, the script auto-detects the game install by checking the default Steam locations (including Flatpak Steam) and every Steam library listed in `libraryfolders.vdf`.
 
 You can point it at either the Steam install root or the actual data folder — the script tries both:
 
 - `.../Zenless Zone Zero` (Steam install root)
 - `.../Zenless Zone Zero/games/ZenlessZoneZero Game/ZenlessZoneZero_Data`
+
+## Options
+
+| Option | Description |
+| --- | --- |
+| `-q`, `--quiet` | Print only the final URL (errors are still shown) |
+| `--no-copy` | Don't copy the URL to the clipboard |
+| `-v`, `--verbose` | Show full cache paths and a masked view of each candidate URL |
+| `-h`, `--help` | Show help |
+
+Progress messages go to stderr and the URL goes to stdout, so you can capture it in a variable:
+
+```bash
+url="$(bash signal.sh -q --no-copy)"
+```
+
+Set `NO_COLOR=1` to turn off colored output.
