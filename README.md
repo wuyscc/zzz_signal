@@ -59,7 +59,7 @@ Every push and pull request runs the [Validate](.github/workflows/validate.yml) 
 
 - **Syntax**: `bash -n` on every shell script
 - **ShellCheck**: lint `signal.sh` and the test scripts
-- **Safety**: `tests/safety_check.sh` rejects risky patterns (`eval`, `sudo`, `rm -r`, piping downloads into a shell, turning off TLS checks, uploading data, requests with no timeout) and makes sure the embedded Python compiles
+- **Safety**: `tests/safety_check.sh` rejects risky patterns (`eval`, `sudo`, `rm -r`, package installs, piping downloads into a shell, turning off TLS checks, uploading data, requests with no timeout) and makes sure the embedded Python compiles
 - **Functional tests**: `tests/test_signal.sh` runs the script against a fake install with a mocked `curl`, so no real network requests are made
 
 Run the same checks locally:

@@ -153,18 +153,16 @@ for cmd in curl jq python3; do
 done
 
 if (( ${#missing[@]} > 0 )); then
-    install_hint="Install them with your distro's package manager."
-    if command -v pacman >/dev/null 2>&1; then
-        install_hint="sudo pacman -S ${missing[*]/python3/python}"
-    elif command -v apt-get >/dev/null 2>&1; then
-        install_hint="sudo apt install ${missing[*]}"
-    elif command -v dnf >/dev/null 2>&1; then
-        install_hint="sudo dnf install ${missing[*]}"
-    elif command -v zypper >/dev/null 2>&1; then
-        install_hint="sudo zypper install ${missing[*]}"
+    # Package names match the command names, except python3 on Arch.
+    packages=("${missing[@]}")
+    if [[ -f /etc/arch-release ]]; then
+        packages=("${packages[@]/python3/python}")
     fi
     fail "Missing required command(s): ${missing[*]}" \
-        "Install with:  ${c_bold}${install_hint}${c_reset}"
+        "Please install these packages with your distro's package manager:" \
+        "  ${c_bold}${packages[*]}${c_reset}" \
+        "" \
+        "Then run this script again."
 fi
 
 ok "curl, jq and python3 available"

@@ -25,6 +25,7 @@ rules=(
     '(curl|wget)[^#]*\|\s*(ba|z|da)?sh\b @@ piping downloads into a shell'
     'base64\s+(-d|--decode) @@ decoding hidden payloads'
     '/dev/(tcp|udp)/ @@ raw network sockets'
+    '\b(apt(-get)?|dnf|yum|zypper|apk|pip3?|brew)\s+(install|add)\b|\bpacman\s+-S @@ the script must never install packages'
     '\bchmod\b @@ changing file permissions is not needed'
     '\bcrontab\b @@ persistence is not allowed'
     '(>|>>)\s*"?\$HOME/\.(bashrc|profile|zshrc) @@ editing shell startup files'

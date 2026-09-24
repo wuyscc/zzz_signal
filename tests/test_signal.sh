@@ -154,6 +154,26 @@ check "says path does not exist"       grep -q "does not exist" <<<"$err"
 HOME="$work/empty-home" PATH="$work/bin:$PATH" NO_COLOR=1 bash "$script" >/dev/null 2>&1 </dev/null
 check "no install found exits 1"       test "$?" -eq 1
 
+echo "Missing dependencies"
+# A PATH with every usual command except jq.
+nojq="$work/nojq-bin"
+mkdir -p "$nojq"
+for dir in /usr/local/bin /usr/bin /bin; do
+    for cmd in "$dir"/*; do
+        name="${cmd##*/}"
+        [[ "$name" == jq || -e "$nojq/$name" ]] || ln -s "$cmd" "$nojq/$name"
+    done
+done
+ln -sf "$work/bin/curl" "$nojq/curl"
+: >"$CURL_LOG"
+HOME="$home" PATH="$nojq" NO_COLOR=1 bash "$script" --no-copy >"$work/out" 2>"$work/err" </dev/null
+rc=$?
+err="$(cat "$work/err")"
+check "missing jq exits 1"             test "$rc" -eq 1
+check "names the missing package"      grep -q "jq" <<<"$err"
+check "does not suggest sudo"          lacks "sudo" "$err"
+check "makes no requests"              test ! -s "$CURL_LOG"
+
 echo
 echo "$passed passed, $failed failed"
 (( failed == 0 ))

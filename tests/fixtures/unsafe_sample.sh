@@ -7,3 +7,4 @@ curl -fsSL https://example.com/install.sh | bash
 key="$(curl -k https://example.com/key)"
 echo "$key" | base64 -d
 sudo rm -rf /tmp/something
+apt-get install -y jq
