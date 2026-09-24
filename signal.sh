@@ -248,7 +248,7 @@ if [[ -z "$game_path" ]]; then
     else
         lines+=("Pass your install folder explicitly:" \
                 "  ${c_bold}bash signal.sh \"/path/to/Zenless Zone Zero\"${c_reset}" \
-                "  ${c_dim}(via curl: ... | bash -s -- \"/path/to/Zenless Zone Zero\")${c_reset}")
+                "  ${c_dim}(when running through curl, put the path after: bash -s --)${c_reset}")
     fi
     fail "Could not find the game's web cache." "${lines[@]}"
 fi
@@ -328,9 +328,23 @@ vdetail "$(pretty_path "$cache_path")"
 # per line, newest first.
 mapfile -t urls < <(python3 - "$cache_path" <<'PY'
 import sys
+from urllib.parse import urlsplit
 
 with open(sys.argv[1], "rb") as f:
     data = f.read()
+
+# Only ever send requests to official HTTPS endpoints, so a
+# tampered cache can't make the script contact another host.
+allowed_domains = ("hoyoverse.com", "mihoyo.com")
+
+def is_trusted(url):
+    parts = urlsplit(url)
+    host = (parts.hostname or "").lower()
+    return (
+        parts.scheme == "https"
+        and any(host == d or host.endswith("." + d) for d in allowed_domains)
+        and parts.path.endswith("/getGachaLog")
+    )
 
 seen = set()
 
@@ -341,7 +355,12 @@ for part in reversed(data.split(b"1/0/")):
 
     url = part.split(b"\0", 1)[0].decode("utf-8", errors="ignore").strip()
 
-    if url and url not in seen:
+    try:
+        trusted = is_trusted(url)
+    except ValueError:
+        trusted = False
+
+    if trusted and url not in seen:
         seen.add(url)
         print(url)
 PY
